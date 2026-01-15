@@ -217,12 +217,11 @@ parameterize current_output = port in
 
 **Local syntax:**
 ```
-let syntax when = rules () of { (test, body) -> if test then body else () }
-in when(ready(), go())
+let syntax pipe_if = rules () of { pipe_if(test, f) -> cond { test -> . f } }
+in pipe_if(get_bar(), display)
 ```
 
 ### Iteration with named Let
-
 ```
 let loop(i = 0, acc = 1) in
   if i = n then acc
@@ -230,7 +229,6 @@ let loop(i = 0, acc = 1) in
 ```
 
 ### Iteration with For
-
 The `for` loop parses as Scheme's `do`:
 
 ```
