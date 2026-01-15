@@ -665,8 +665,8 @@ is consumed up to an optional second backslash:
 | Token | Purpose |
 |-------|---------|
 | `(` `)` | Grouping, argument/formals lists, value expressions |
-| `[` `]` | List literals |
-| `#[` `]` | Vector literals |
+| `[` `]` | List constructors |
+| `#[` `]` | Vector constructors |
 | `{` `}` | Explicit blocks |
 | `,` | Separator in lists, arguments, bindings |
 | `;` | Statement/definition separator |
