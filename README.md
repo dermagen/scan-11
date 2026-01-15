@@ -5,20 +5,20 @@ This document describes an algebraic surface syntax for Scheme code (NOT arbitra
 
 ## 1. General Structure and Layout
 
-The syntax relies on a Haskell-like **indentation-sensitive layout** rule (the "off-side rule") to minimize visual noise. While explicit braces `{ }`, semicolons `;`, and vertical bars `|` can be used to delimit blocks, statements, and clauses, they can be omitted if one pefers to use significant white space.
+The syntax optionally uses Haskell-like **indentation-sensitive layout** rule (the "off-side rule") to minimize (or rather create a new type of) visual noise. While explicit braces `{ }`, semicolons `;`, and vertical bars `|` can be used to delimit blocks, statements, and clauses, they can be omitted if one pefers to use significant white space.
 
 ### Layout Triggers
-Certain keywords trigger a layout context. If these keywords are **not** immediately followed by an opening brace `{`, the indentation of the next token establishes a column ("immediately" means nothing in between except white space and comments).
+Certain keywords trigger a layout context. If these keywords are **not** immediately followed by an opening brace `{`, the indentation of the next token establishes a column ("immediately" means nothing in between except white space and comments). Only plain spaces can be used to indent lines using significant whitespace.
 *   **Block Triggers** (`do`, `with`): Subsequent lines indented to this column are treated as statements separated by semicolons `;`.
 *   **Alternative Triggers** (`of`, `cond`): Subsequent lines indented to this column are treated as clauses separated by vertical bars `|`.
 
 Note: If an opening brace is not preceded by a trigger keyword, `do` is inserted automatically.
 
 In layout mode:
-1. The first token after the trigger keyword establishes the **reference column**
-2. Lines starting at the reference column begin new entries (implicit separator)
+1. The first token after the trigger keyword establishes the **reference column**; (open brace inserted before first token)
+2. Lines starting at the reference column begin new entries (separator is inserted before the line)
 3. Lines indented further continue the current entry
-4. Lines indented less close the implicit block
+4. Lines indented less close the implicit block (close brace inserted before the line)
 
 This allows writing:
 
@@ -37,7 +37,7 @@ case x of { RED -> 0 | GREEN -> 1 | BLUE -> 2 }
 
 **Example:**
 
-```haskell
+```
 -- Layout-based Syntax
 fn x -> 
   if x < 0 then
@@ -59,13 +59,13 @@ fn x ->
 
 ## Expressions
 
-### Atoms and Operators
+### Atomic Expressions and Operators
 
 Atomic expressions include identifiers, literals (numbers, strings, booleans, characters), and infix/prefix operator expressions. Standard operators include arithmetic (`+`, `-`, `*`, `/`, `quo`, `rem`, `div`, `mod`), comparison (`<`, `<=`, `=`, `>=`, `>`), and logical (`and`, `or`, `not`).
 
 ### Parenthesized Expressions and Multiple Values
 
-Parentheses have dual purpose—grouping for operator precedence and constructing multiple value expressions (unlike tuples, they are NOT first-class):
+Parentheses have dual purpose—grouping for operator precedence and constructing multiple value expressions (unlike tuples, multiple values are NOT first-class):
 
 | Syntax | Meaning |
 |--------|---------|
@@ -101,9 +101,11 @@ notation is not used (there is no such thing as `apply` for a syntactic keyword)
 Anonymous functions use the `fn` keyword:
 
 ```
-fn x -> x + 1
-fn (x, y) -> x * y
-fn (head, @tail) -> tail
+fn x -> x + 1               -- (lambda (x) (+ x 1))
+fn (x) -> x + 1             -- same as above
+fn (x, y) -> x * y          -- (lambda (x y) (* x y))
+fn (head, @tail) -> tail    -- (lambda (head . tail) tail)
+fn (@tail) -> tail          -- (lambda tail tail)
 ```
 
 For case-lambda (multiple clauses with different arities), use `fn of`:
@@ -194,30 +196,23 @@ let val x = 1, y = 2 in x + y
 
 let double(x) = x * 2 in double(21)
 
-letrec val even(n) = n = 0 or odd(n - 1),
-           odd(n) = n > 0 and even(n - 1)
+letrec even(n) = n = 0 or odd(n - 1),
+       odd(n) = n > 0 and even(n - 1)
 in even(10)
 ```
 
-Note that here and in other `let` expressions the `var` keyword may be dropped; it is the default
-type of binding.
+Note that here and in other `let` expressions the `val` keyword may be dropped; it is the default
+type of binding (the other is `syntax`).
 
-**Multiple-value bindings** use `val` with tuple patterns:
+**Multiple-value bindings** use `val` with parenthesized patterns:
 ```
-let val (q, r) = divmod(17, 5) in q
-```
-
-**Named let** for iteration:
-```
-let loop(i = 0, acc = 1) in
-  if i = n then acc
-  else loop(i + 1, acc * i)
+let (q, r) = divmod(17, 5) in q
 ```
 
 **Parameterize:**
 ```
-parameterize current_output = file in
-  print("hello")
+parameterize current_output = port in
+  display("hello")
 ```
 
 **Local syntax:**
@@ -226,16 +221,22 @@ let syntax when = rules () of { (test, body) -> if test then body else () }
 in when(ready(), go())
 ```
 
-### Iteration with For
-
-The `for` loop parsews as Scheme's `do`:
+### Iteration with named Let
 
 ```
-for i = 0 then i + 1,
-    acc = 1 then acc * i
-until i = n -> acc do {
-  write(i); newline();
-}
+let loop(i = 0, acc = 1) in
+  if i = n then acc
+  else loop(i + 1, acc * i)
+```
+
+### Iteration with For
+
+The `for` loop parses as Scheme's `do`:
+
+```
+for i = 0 then i + 1, acc = 1 then acc * i
+until i = n -> acc
+do { write(i); newline(); }
 ```
 
 The `until` clause specifies termination conditions as `test -> result` clause.
@@ -247,7 +248,7 @@ The `guard` form handles exceptions:
 ```
 guard exn of {
   is_file_error(exn) -> default_value
-| -> . reraise
+| reraise(exn)
 } do {
   read_file(path)
 }
@@ -255,22 +256,21 @@ guard exn of {
 
 ### List constructors
 
-| Syntax | Meaning |
+| Syntax | Parses as |
 |--------|---------|
 | `[]` | Empty list `'()` |
 | `[a]` | `(list a)` |
 | `[a, b, c]` | `(list a b c)` |
-| `[a, b, @ rest]` | `(list* a b rest)` (improper/spliced) |
-| `[@ xs]` | `(list-copy xs)` |
+| `[a, b, @rest]` | `(apply list a b rest)` (cf. `list*`) |
 
 ### Vector constructors
 
-| Syntax | Meaning |
+| Syntax | Parses as |
 |--------|---------|
 | `#[]` | Empty vector `#()` |
 | `#[a]` | `(vector a)` |
 | `#[a, b, c]` | `(vector a b c)` |
-| `#[a, b, @ rest]` | `(apply vector a b rest)` |
+| `#[a, b, @rest]` | `(apply vector a b rest)` |
 
 ### Peculiars
 
@@ -293,10 +293,12 @@ val double(x) = x * 2
 val fact(n) = if n = 0 then 1 else n * fact(n - 1)
 ```
 
-The second form defines multiple values; the last two are shorthand for `fn`, i.e. lambda:
+The second form defines multiple values; 
+The last two forms are shorthand for `fn`, i.e. lambda:
 
 ```
 val double = fn x -> x * 2
+val fact = fn n -> if n = 0 then 1 else n * fact(n - 1)
 ```
 
 ### Record Type definitions
@@ -410,13 +412,14 @@ Identifiers are automatically translated to Scheme symbols according to these ru
 | Pattern | Scheme Form | Example |
 |---------|-------------|---------|
 | `is_xxx` | `xxx?` | `is_null` → `null?` |
+| `xxx_ip` | `xxx!` | `reverse_ip` → `reverse!` |
 | `xxx_to_yyy` | `xxx->yyy` | `string_to_list` → `string->list` |
-| `xxx_with_yyy` | `xxx/yyy` | `call_with_cc` → `call/cc` |
-| `xxx_lt` | `xxx<` | `char_lt` → `char<` |
-| `xxx_le` | `xxx<=` | `char_le` → `char<=` |
-| `xxx_eq` | `xxx=` | `char_eq` → `char=` |
-| `xxx_ge` | `xxx>=` | `char_ge` → `char>=` |
-| `xxx_gt` | `xxx>` | `char_gt` → `char>` |
+| `xxx_w_yyy` | `xxx/yyy` | `call_w_cc` → `call/cc` |
+| `xxx_lt` | `xxx<` | `vector_lt` → `vector<` |
+| `xxx_le` | `xxx<=` | `vector_le` → `vector<=` |
+| `xxx_eq` | `xxx=` | `vector_eq` → `vector=` |
+| `xxx_ge` | `xxx>=` | `vector_ge` → `vector>=` |
+| `xxx_gt` | `xxx>` | `vector_gt` → `vector>` |
 | `xxx_add` | `xxx+` | `fx_add` → `fx+` |
 | `xxx_sub` | `xxx-` | `fx_sub` → `fx-` |
 | `xxx_mul` | `xxx*` | `fx_mul` → `fx*` |
@@ -709,14 +712,156 @@ This section presents the complete formal grammar in extended BNF notation.
     *   $^{,+}$ : One or more, separated by commas
     *   $^{|*}$ : Zero or more, separated by vertical bars
 
----
+### Program Structure
+
+Here is the grammar reformatted using LaTeX arrays. This method provides the clean, borderless, "academic" look you requested, with distinct styling for $\langle \text{non-terminals} \rangle$ and $\textbf{terminals}$.
 
 ### Program Structure
 
+$$
+\begin{array}{lcl}
+\text{\hspace{10em}} & \text{} & \text{\hspace{60em}} \\
+\langle program \rangle & \to & \langle def or cmd \rangle^{*} \\
+\langle def or cmd \rangle & \to & \langle def \rangle \\
+& \mid & \langle cmd \rangle
+\end{array}
+$$
+
+## test
+
+
+### Expressions
+
+```math
+\begin{array}{lcl}
+\langle aexp \rangle & \to & \langle lit \rangle \\
+& \mid & \textbf{underscore} \\
+& \mid & \textbf{...} \\
+\\
+\langle oexp \rangle & \to & \langle exp \rangle \ \textbf{@} \ \langle exp \rangle \\
+& \mid & \langle exp \rangle \ \textbf{:} \ \langle exp \rangle \\
+& \mid & \langle exp \rangle \ \textbf{or} \ \langle exp \rangle \\
+& \mid & \langle exp \rangle \ \textbf{and} \ \langle exp \rangle \\
+& \mid & \textbf{not} \ \langle exp \rangle \\
+& \mid & \langle exp \rangle \ \textbf{==} \ \langle exp \rangle \mid \langle exp \rangle \ \textbf{=} \ \langle exp \rangle \\
+& \mid & \langle exp \rangle \ \textbf{>} \ \langle exp \rangle \mid \langle exp \rangle \ \textbf{>=} \ \langle exp \rangle \\
+& \mid & \langle exp \rangle \ \textbf{<} \ \langle exp \rangle \mid \langle exp \rangle \ \textbf{<=} \ \langle exp \rangle \\
+& \mid & \langle exp \rangle \ \textbf{+} \ \langle exp \rangle \mid \langle exp \rangle \ \textbf{-} \ \langle exp \rangle \\
+& \mid & \langle exp \rangle \ \textbf{*} \ \langle exp \rangle \mid \langle exp \rangle \ \textbf{/} \ \langle exp \rangle \\
+& \mid & \langle exp \rangle \ \textbf{quo} \ \langle exp \rangle \mid \langle exp \rangle \ \textbf{rem} \ \langle exp \rangle \\
+& \mid & \langle exp \rangle \ \textbf{div} \ \langle exp \rangle \mid \langle exp \rangle \ \textbf{mod} \ \langle exp \rangle \\
+\\
+\langle exp \rangle & \to & \langle aexp \rangle \\
+& \mid & \langle oexp \rangle \\
+& \mid & \langle vals \rangle \\
+& \mid & \langle exp \rangle \ \langle vals \rangle \\
+& \mid & \langle list \rangle \\
+& \mid & \langle vector \rangle \\
+& \mid & \textbf{fn} \ \langle formals \rangle \ \textbf{->} \ \langle exp \rangle \\
+& \mid & \textbf{fn} \ \textbf{of} \ \textbf{\{} \ \langle formals\_exp \rangle^{|*} \ \textbf{\}} \\
+& \mid & \textbf{if} \ \langle exp \rangle \ \textbf{then} \ \langle exp \rangle \ \textbf{else} \ \langle exp \rangle \\
+& \mid & \textbf{case} \ \langle exp \rangle \ \textbf{of} \ \textbf{\{} \ \langle pclause \rangle^{|*} \ \textbf{\}} \\
+& \mid & \textbf{cond} \ \textbf{\{} \ \langle clause \rangle^{|*} \ \textbf{\}} \\
+& \mid & \textbf{do} \ \textbf{\{} \ \langle def \rangle^{*} \ \langle cmd \rangle^{*} \ \langle exp \rangle \ \textbf{\}} \\
+& \mid & \langle let \rangle \ \textbf{in} \ \langle exp \rangle \\
+& \mid & \textbf{let} \ \langle id \rangle \ \textbf{(} \ \langle bnd \rangle^{,*} \ \textbf{)} \ \textbf{in} \ \langle exp \rangle \\
+& \mid & \textbf{for} \ \langle sbnd \rangle^{,*} \ \textbf{until} \ \langle clause \rangle \ \textbf{do} \ \textbf{\{} \ \langle def \rangle^{*} \ \langle cmd \rangle^{*} \ \textbf{\}} \\
+& \mid & \textbf{guard} \ \langle id \rangle \ \textbf{of} \ \textbf{\{} \ \langle clause \rangle^{|*} \ \textbf{\}} \ \textbf{do} \ \textbf{\{} \ \langle def \rangle^{*} \ \langle cmd \rangle^{*} \ \textbf{\}} \\
+\\
+\langle formals\_exp \rangle & \to & \langle formals \rangle \ \textbf{->} \ \langle exp \rangle \\
+\\
+\langle clause \rangle & \to & \langle exp \rangle \ \textbf{->} \ \langle exp \rangle \\
+& \mid & \langle exp \rangle \ \textbf{->} \ \textbf{.} \\
+& \mid & \langle exp \rangle \ \textbf{->} \ \textbf{.} \ \langle exp \rangle \\
+& \mid & \textbf{->} \ \textbf{.} \ \langle exp \rangle \\
+& \mid & \langle exp \rangle \\
+\\
+\langle pclause \rangle & \to & \langle pat \rangle \ \textbf{->} \ \langle exp \rangle \\
+& \mid & \langle pat \rangle \ \textbf{->} \ \textbf{.} \ \langle exp \rangle \\
+& \mid & \textbf{->} \ \textbf{.} \ \langle exp \rangle \\
+\\
+\langle pat \rangle & \to & \langle lit \rangle \\
+& \mid & \textbf{(} \ \langle lit \rangle^{|*} \ \textbf{)}
+\end{array}
+```
+
+### Bindings and Rules
+
+```math
+\begin{array}{lcl}
+\text{\hspace{20em}} & \text{} & \text{\hspace{60em}} \\
+\langle sbnd \rangle & \to & \langle bnd \rangle \ \textbf{then} \ \langle exp \rangle \\
+& \mid & \langle bnd \rangle \\
+\\
+\langle let \rangle & \to & \textbf{let} \ \textbf{val}^{?} \ \langle bnd \rangle^{,*} \\
+& \mid & \textbf{letrec} \ \textbf{val}^{?} \ \langle bnd \rangle^{,*} \\
+& \mid & \textbf{let} \ \textbf{syntax} \ \langle id\_rules \rangle^{,*} \\
+& \mid & \textbf{letrec} \ \textbf{syntax} \ \langle id\_rules \rangle^{,*} \\
+& \mid & \textbf{parameterize} \ \langle bnd \rangle^{,*} \\
+\\
+\langle bnd \rangle & \to & \langle formals \rangle \ \textbf{=} \ \langle exp \rangle \\
+& \mid & \langle id \rangle \ \langle formals \rangle \ \textbf{=} \ \langle exp \rangle \\
+\\
+\langle id\_rules \rangle & \to & \langle id \rangle \ \textbf{=} \ \langle rules \rangle \\
+\langle rules \rangle & \to & \textbf{rules} \ \textbf{(} \ \langle id \rangle^{,*} \ \textbf{)} \ \textbf{of} \ \textbf{\{} \ \langle exp\_to\_exp \rangle^{|*} \ \textbf{\}} \\
+\langle exp\_to\_exp \rangle & \to & \langle exp \rangle \ \textbf{->} \ \langle exp \rangle
+\end{array}
+```
+### Definitions and Commands
+
+```math
+\begin{array}{lcl}
+\langle def \rangle & \to & \textbf{do} \ \textbf{\{} \ \langle def \rangle^{*} \ \textbf{\}} \ \textbf{;} \\
+& \mid & \textbf{val} \ \langle bnd \rangle \ \textbf{;} \\
+& \mid & \textbf{record} \ \langle id \rangle \ \textbf{=} \ \langle rdef \rangle \ \textbf{;} \\
+& \mid & \textbf{syntax} \ \langle id \rangle \ \textbf{=} \ \langle rules \rangle \ \textbf{;} \\
+& \mid & \textbf{include} \ \langle str \rangle \ \textbf{;} \\
+& \mid & \textbf{include\_ci} \ \langle str \rangle \ \textbf{;} \\
+& \mid & \textbf{import} \ \langle iset \rangle \ \textbf{;} \\
+& \mid & \textbf{library} \ \langle lname \rangle \ \textbf{with} \ \textbf{\{} \ \langle ldef \rangle^{*} \ \textbf{\}} \ \textbf{;}
+\\
+\langle iset \rangle & \to & \langle lname \rangle \\
+& \mid & \langle iset \rangle \ \textbf{exposing}^{?} \ \textbf{(} \ \langle id \rangle^{,*} \ \textbf{)} \\
+& \mid & \langle iset \rangle \ \textbf{hiding} \ \textbf{(} \ \langle id \rangle^{,*} \ \textbf{)} \\
+& \mid & \langle iset \rangle \ \textbf{renaming} \ \textbf{(} \ \langle id\_as\_id \rangle^{,*} \ \textbf{)} \\
+& \mid & \langle iset \rangle \ \textbf{qualifying} \ \textbf{(} \ \langle prefix \rangle \ \textbf{)} \\
+\\
+\langle id\_as\_id \rangle & \to & \langle id \rangle \ \textbf{as} \ \langle id \rangle \\
+\langle lname \rangle & \to & \langle lseg \rangle \mid \langle lname \rangle \ \textbf{.} \ \langle lseg \rangle \\
+\langle lseg \rangle & \to & \langle id \rangle \mid \langle int \rangle \\
+\\
+\langle cmd \rangle & \to & \langle let \rangle \ \textbf{;} \\
+& \mid & \langle id \rangle \ \textbf{:=} \ \langle exp \rangle \ \textbf{;} \\
+& \mid & \textbf{if} \ \langle exp \rangle \ \textbf{then} \ \langle exp \rangle \ \textbf{;} \\
+& \mid & \langle exp \rangle \ \textbf{;} \\
+\\
+\langle vals \rangle & \to & \textbf{(} \ \textbf{)} \\
+& \mid & \textbf{(} \ \langle exp \rangle \ \textbf{)} \\
+& \mid & \textbf{(} \ \langle exp \rangle^{,+} \ \textbf{)} \\
+& \mid & \textbf{(} \ \langle exp \rangle^{,*} \ \textbf{@} \ \langle exp \rangle \ \textbf{)} \\
+\\
+\langle formals \rangle & \to & \textbf{(} \ \textbf{)} \\
+& \mid & \langle id \rangle \\
+& \mid & \textbf{(} \ \langle id \rangle \ \textbf{)} \\
+& \mid & \textbf{(} \ \langle id \rangle^{,*} \ \textbf{)} \\
+& \mid & \textbf{(} \ \langle id \rangle^{,*} \ \textbf{@} \ \langle id \rangle \ \textbf{)} \\
+\\
+\langle list \rangle & \to & \textbf{[} \ \textbf{]} \\
+& \mid & \textbf{[} \ \langle exp \rangle^{,+} \ \textbf{]} \\
+& \mid & \textbf{[} \ \langle exp \rangle^{,*} \ \textbf{@} \ \langle exp \rangle \ \textbf{]} \\
+\\
+\langle vector \rangle & \to & \textbf{\#[} \ \textbf{]} \\
+& \mid & \textbf{\#[} \ \langle exp \rangle^{,+} \ \textbf{]} \\
+& \mid & \textbf{\#[} \ \langle exp \rangle^{,*} \ \textbf{@} \ \langle exp \rangle \ \textbf{]}
+\end{array}
+```
+
+
+
 | Production Rule | Description |
 | :--- | :--- |
-| $\langle program \rangle$ &rarr; $\langle def\_or\_cmd \rangle^*$ | A program is a sequence of definitions or commands |
-| $\langle def\_or\_cmd \rangle$ &rarr; | |
+| $\langle program \rangle$ &rarr; $\langle def or cmd \rangle^*$ | A program is a sequence of definitions or commands |
+| $\langle def  or  cmd \rangle$ &rarr; | |
 | &nbsp;&nbsp; $\langle def \rangle$ | |
 | &nbsp;&nbsp; \| $\langle cmd \rangle$ | Except for bodyless `let` forms |
 
