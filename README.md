@@ -715,25 +715,22 @@ This section presents the complete formal grammar in extended BNF notation.
 ### Program Structure
 
 ```math
-\begin{array}{r c l}
-\hspace{4cm} & \hspace{0.5cm} & \\[-1em]
-\text{\hspace{10em}} & \text{} & \text{\hspace{60em}} \\
-\langle program \rangle & \to & \langle def or cmd \rangle^{*} \\
-\langle def or cmd \rangle & \to & \langle def \rangle \\
+\begin{array}{lcl}
+\hspace{3cm} & \hspace{0.5cm} & \hspace{10cm} \\
+\langle program \rangle & \to & \langle def\_or\_cmd \rangle^{*} \\
+\\
+\langle def\_or\_cmd \rangle & \to & \langle def \rangle \\
 & \mid & \langle cmd \rangle
 \end{array}
 ```
 
-## test
-
-
 ### Expressions
 
 ```math
-\begin{array}{r c l}
-\hspace{4cm} & \hspace{0.5cm} & \\[-1em]
+\begin{array}{lcl}
+\hspace{3cm} & \hspace{0.5cm} & \hspace{10cm} \\
 \langle aexp \rangle & \to & \langle lit \rangle \\
-& \mid & \textbf{underscore} \\
+& \mid & \textbf{\_} \\
 & \mid & \textbf{...} \\
 \\
 \langle oexp \rangle & \to & \langle exp \rangle \ \textbf{@} \ \langle exp \rangle \\
@@ -744,7 +741,7 @@ This section presents the complete formal grammar in extended BNF notation.
 & \mid & \langle exp \rangle \ \textbf{==} \ \langle exp \rangle \mid \langle exp \rangle \ \textbf{=} \ \langle exp \rangle \\
 & \mid & \langle exp \rangle \ \textbf{>} \ \langle exp \rangle \mid \langle exp \rangle \ \textbf{>=} \ \langle exp \rangle \\
 & \mid & \langle exp \rangle \ \textbf{<} \ \langle exp \rangle \mid \langle exp \rangle \ \textbf{<=} \ \langle exp \rangle \\
-& \mid & \langle exp \rangle \ \textbf{+} \ \langle exp \rangle \mid \langle exp \rangle \ \textbf{-} \ \langle exp \rangle \\
+& \mid & \langle exp \rangle \ \textbf{+} \ \langle exp \rangle \mid \langle exp \rangle \ \mathtt{-} \ \langle exp \rangle \\
 & \mid & \langle exp \rangle \ \textbf{*} \ \langle exp \rangle \mid \langle exp \rangle \ \textbf{/} \ \langle exp \rangle \\
 & \mid & \langle exp \rangle \ \textbf{quo} \ \langle exp \rangle \mid \langle exp \rangle \ \textbf{rem} \ \langle exp \rangle \\
 & \mid & \langle exp \rangle \ \textbf{div} \ \langle exp \rangle \mid \langle exp \rangle \ \textbf{mod} \ \langle exp \rangle \\
@@ -786,8 +783,8 @@ This section presents the complete formal grammar in extended BNF notation.
 ### Bindings and Rules
 
 ```math
-\begin{array}{lcl}
-\text{\hspace{20em}} & \text{} & \text{\hspace{60em}} \\
+\begin{array}{rcl}
+\hspace{3cm} & \hspace{0.5cm} & \hspace{10cm} \\
 \langle sbnd \rangle & \to & \langle bnd \rangle \ \textbf{then} \ \langle exp \rangle \\
 & \mid & \langle bnd \rangle \\
 \\
@@ -801,6 +798,7 @@ This section presents the complete formal grammar in extended BNF notation.
 & \mid & \langle id \rangle \ \langle formals \rangle \ \textbf{=} \ \langle exp \rangle \\
 \\
 \langle id\_rules \rangle & \to & \langle id \rangle \ \textbf{=} \ \langle rules \rangle \\
+\\
 \langle rules \rangle & \to & \textbf{rules} \ \textbf{(} \ \langle id \rangle^{,*} \ \textbf{)} \ \textbf{of} \ \textbf{\{} \ \langle exp\_to\_exp \rangle^{|*} \ \textbf{\}} \\
 \langle exp\_to\_exp \rangle & \to & \langle exp \rangle \ \textbf{->} \ \langle exp \rangle
 \end{array}
@@ -809,6 +807,7 @@ This section presents the complete formal grammar in extended BNF notation.
 
 ```math
 \begin{array}{lcl}
+\hspace{3cm} & \hspace{0.5cm} & \hspace{10cm} \\
 \langle def \rangle & \to & \textbf{do} \ \textbf{\{} \ \langle def \rangle^{*} \ \textbf{\}} \ \textbf{;} \\
 & \mid & \textbf{val} \ \langle bnd \rangle \ \textbf{;} \\
 & \mid & \textbf{record} \ \langle id \rangle \ \textbf{=} \ \langle rdef \rangle \ \textbf{;} \\
@@ -825,7 +824,9 @@ This section presents the complete formal grammar in extended BNF notation.
 & \mid & \langle iset \rangle \ \textbf{qualifying} \ \textbf{(} \ \langle prefix \rangle \ \textbf{)} \\
 \\
 \langle id\_as\_id \rangle & \to & \langle id \rangle \ \textbf{as} \ \langle id \rangle \\
+\\
 \langle lname \rangle & \to & \langle lseg \rangle \mid \langle lname \rangle \ \textbf{.} \ \langle lseg \rangle \\
+\\
 \langle lseg \rangle & \to & \langle id \rangle \mid \langle int \rangle \\
 \\
 \langle cmd \rangle & \to & \langle let \rangle \ \textbf{;} \\
@@ -853,175 +854,3 @@ This section presents the complete formal grammar in extended BNF notation.
 & \mid & \textbf{\#[} \ \langle exp \rangle^{,*} \ \textbf{@} \ \langle exp \rangle \ \textbf{]}
 \end{array}
 ```
-
-
-
-| Production Rule | Description |
-| :--- | :--- |
-| $\langle program \rangle$ &rarr; $\langle def or cmd \rangle^*$ | A program is a sequence of definitions or commands |
-| $\langle def  or  cmd \rangle$ &rarr; | |
-| &nbsp;&nbsp; $\langle def \rangle$ | |
-| &nbsp;&nbsp; \| $\langle cmd \rangle$ | Except for bodyless `let` forms |
-
-### Atomic and Operator Expressions
-
-| Production Rule | Description |
-| :--- | :--- |
-| $\langle aexp \rangle$ &rarr; | **Atomic Expressions** |
-| &nbsp;&nbsp; $\langle lit \rangle$ | Literals (numbers, strings, etc.) |
-| &nbsp;&nbsp; \| **\_** | `syntax-rules` wildcard |
-| &nbsp;&nbsp; \| **...** | `syntax-rules` ellipsis |
-| $\langle oexp \rangle$ &rarr; | **Operator Expressions** |
-| &nbsp;&nbsp; $\langle exp \rangle$ **@** $\langle exp \rangle$ | Priority 1, `append`, right-associative |
-| &nbsp;&nbsp; \| $\langle exp \rangle$ **:** $\langle exp \rangle$ | Priority 1, `cons`, right-associative |
-| &nbsp;&nbsp; \| $\langle exp \rangle$ **or** $\langle exp \rangle$ | Priority 2 |
-| &nbsp;&nbsp; \| $\langle exp \rangle$ **and** $\langle exp \rangle$ | Priority 3 |
-| &nbsp;&nbsp; \| **not** $\langle exp \rangle$ | Priority 4 |
-| &nbsp;&nbsp; \| $\langle exp \rangle$ **==** $\langle exp \rangle$ | Priority 5, `equal?` |
-| &nbsp;&nbsp; \| $\langle exp \rangle$ **=** $\langle exp \rangle$ | Priority 5, numerical `=` |
-| &nbsp;&nbsp; \| $\langle exp \rangle$ **>** $\langle exp \rangle$ | Priority 5 |
-| &nbsp;&nbsp; \| $\langle exp \rangle$ **>=** $\langle exp \rangle$ | Priority 5 |
-| &nbsp;&nbsp; \| $\langle exp \rangle$ **<** $\langle exp \rangle$ | Priority 5 |
-| &nbsp;&nbsp; \| $\langle exp \rangle$ **<=** $\langle exp \rangle$ | Priority 5 |
-| &nbsp;&nbsp; \| $\langle exp \rangle$ **+** $\langle exp \rangle$ | Priority 6 |
-| &nbsp;&nbsp; \| $\langle exp \rangle$ **-** $\langle exp \rangle$ | Priority 6 |
-| &nbsp;&nbsp; \| $\langle exp \rangle$ **\*** $\langle exp \rangle$ | Priority 7 |
-| &nbsp;&nbsp; \| $\langle exp \rangle$ **/** $\langle exp \rangle$ | Priority 7 |
-| &nbsp;&nbsp; \| $\langle exp \rangle$ **quo** $\langle exp \rangle$ | Priority 7, `quotient` (truncate) |
-| &nbsp;&nbsp; \| $\langle exp \rangle$ **rem** $\langle exp \rangle$ | Priority 7, `remainder` (truncate) |
-| &nbsp;&nbsp; \| $\langle exp \rangle$ **div** $\langle exp \rangle$ | Priority 7, `floor-quotient` |
-| &nbsp;&nbsp; \| $\langle exp \rangle$ **mod** $\langle exp \rangle$ | Priority 7, `modulo` (floor) |
-
-### General Expressions
-
-| Production Rule | Description |
-| :--- | :--- |
-| $\langle exp \rangle$ &rarr; | |
-| &nbsp;&nbsp; $\langle aexp \rangle$ | Atomic expressions |
-| &nbsp;&nbsp; \| $\langle oexp \rangle$ | Operator expressions |
-| &nbsp;&nbsp; \| $\langle vals \rangle$ | Priority override or `values` form |
-| &nbsp;&nbsp; \| $\langle exp \rangle$ $\langle vals \rangle$ | Application (or `apply` if `@` is in vals) |
-| &nbsp;&nbsp; \| $\langle list \rangle$ | List constructor |
-| &nbsp;&nbsp; \| $\langle vector \rangle$ | Vector constructor |
-| &nbsp;&nbsp; \| **fn** $\langle formals \rangle$ **->** $\langle exp \rangle$ | Lambda expression |
-| &nbsp;&nbsp; \| **fn** **of** **{** $\langle formals\_exp \rangle^{|\*} $ **}** | Case-lambda |
-| &nbsp;&nbsp; \| **if** $\langle exp \rangle$ **then** $\langle exp \rangle$ **else** $\langle exp \rangle$ | Two-arm conditional |
-| &nbsp;&nbsp; \| **case** $\langle exp \rangle$ **of** **{** $\langle pclause \rangle^{|\*} $ **}** | Pattern match `case` |
-| &nbsp;&nbsp; \| **cond** **{** $\langle clause \rangle^{|\*} $ **}** | Conditional `cond` |
-| &nbsp;&nbsp; \| **do** **{** $\langle def \rangle^*$ $\langle cmd \rangle^*$ $\langle exp \rangle$ **}** | Body or `begin` |
-| &nbsp;&nbsp; \| $\langle let \rangle$ **in** $\langle exp \rangle$ | Let-like binding forms |
-| &nbsp;&nbsp; \| **let** $\langle id \rangle$ **(** $\langle bnd \rangle^{,*} $ **)** **in** $\langle exp \rangle$ | Named `let` (single-value binds only) |
-| &nbsp;&nbsp; \| **for** $\langle sbnd \rangle^{,*} $ **until** $\langle clause \rangle$ **do** **{** $\langle def \rangle^*$ $\langle cmd \rangle^*$ **}** | Scheme `do` iteration form |
-| &nbsp;&nbsp; \| **guard** $\langle id \rangle$ **of** **{** $\langle clause \rangle^{|\*} $ **}** **do** **{** $\langle def \rangle^*$ $\langle cmd \rangle^*$ **}** | Exception handling |
-
-### Clauses and Patterns
-
-| Production Rule | Description |
-| :--- | :--- |
-| $\langle formals\_exp \rangle$ &rarr; $\langle formals \rangle$ **->** $\langle exp \rangle$ | |
-| $\langle clause \rangle$ &rarr; | **Conditional Clauses** |
-| &nbsp;&nbsp; $\langle exp \rangle$ **->** $\langle exp \rangle$ | Standard clause |
-| &nbsp;&nbsp; \| $\langle exp \rangle$ **->** **.** | Return result if true |
-| &nbsp;&nbsp; \| $\langle exp \rangle$ **->** **.** $\langle exp \rangle$ | Scheme's `=>` clause (apply to result) |
-| &nbsp;&nbsp; \| **->** **.** $\langle exp \rangle$ | `else =>` clause (last, `case` only) |
-| &nbsp;&nbsp; \| $\langle exp \rangle$ | `else` clause (last, `cond`/`case` only) |
-| $\langle pclause \rangle$ &rarr; | **Pattern Clauses** |
-| &nbsp;&nbsp; $\langle pat \rangle$ **->** $\langle exp \rangle$ | Standard pattern match |
-| &nbsp;&nbsp; \| $\langle pat \rangle$ **->** **.** $\langle exp \rangle$ | Scheme's `=>` clause |
-| &nbsp;&nbsp; \| **->** **.** $\langle exp \rangle$ | `else =>` clause (last, `case` only) |
-| $\langle pat \rangle$ &rarr; | |
-| &nbsp;&nbsp; $\langle lit \rangle$ | Shortcut for `( <lit> )` |
-| &nbsp;&nbsp; \| **(** $\langle lit \rangle^{|\*} $ **)** | Alternatives (literals only) |
-
-### Bindings and Let Forms
-
-| Production Rule | Description |
-| :--- | :--- |
-| $\langle sbnd \rangle$ &rarr; | **Stepped Bindings (for loops)** |
-| &nbsp;&nbsp; $\langle bnd \rangle$ **then** $\langle exp \rangle$ | With step expression |
-| &nbsp;&nbsp; \| $\langle bnd \rangle$ | Without step |
-| $\langle let \rangle$ &rarr; | **Binding Keyword Blocks** |
-| &nbsp;&nbsp; **let** **val**$^?$ $\langle bnd \rangle^{,*} $ | `let` or `let-values` |
-| &nbsp;&nbsp; \| **letrec** **val**$^?$ $\langle bnd \rangle^{,*} $ | `letrec` |
-| &nbsp;&nbsp; \| **let** **syntax** $\langle id\_rules \rangle^{,*} $ | `let-syntax` |
-| &nbsp;&nbsp; \| **letrec** **syntax** $\langle id\_rules \rangle^{,*} $ | `letrec-syntax` |
-| &nbsp;&nbsp; \| **parameterize** $\langle bnd \rangle^{,*} $ | `parameterize` |
-| $\langle bnd \rangle$ &rarr; | |
-| &nbsp;&nbsp; $\langle formals \rangle$ **=** $\langle exp \rangle$ | Single/multi-value pattern |
-| &nbsp;&nbsp; \| $\langle id \rangle$ $\langle formals \rangle$ **=** $\langle exp \rangle$ | Function shortcut syntax |
-
-### Macros and Rules
-
-| Production Rule | Description |
-| :--- | :--- |
-| $\langle id\_rules \rangle$ &rarr; $\langle id \rangle$ **=** $\langle rules \rangle$ | |
-| $\langle rules \rangle$ &rarr; **rules** **(** $\langle id \rangle^{,*} $ **)** **of** **{** $\langle exp\_to\_exp \rangle^{|\*} $ **}** | `syntax-rules` definition |
-| $\langle exp\_to\_exp \rangle$ &rarr; $\langle exp \rangle$ **->** $\langle exp \rangle$ | Pattern transformation |
-
-### Definitions
-
-| Production Rule | Description |
-| :--- | :--- |
-| $\langle def \rangle$ &rarr; | |
-| &nbsp;&nbsp; **do** **{** $\langle def \rangle^*$ **}** **;** | Splicing `begin` (in def context) |
-| &nbsp;&nbsp; \| **val** $\langle bnd \rangle$ **;** | `define` or `define-values` |
-| &nbsp;&nbsp; \| **record** $\langle id \rangle$ **=** $\langle rdef \rangle$ **;** | `define-record-type` (rdef TBD) |
-| &nbsp;&nbsp; \| **syntax** $\langle id \rangle$ **=** $\langle rules \rangle$ **;** | `define-syntax` |
-| &nbsp;&nbsp; \| **include** $\langle str \rangle$ **;** | |
-| &nbsp;&nbsp; \| **include\_ci** $\langle str \rangle$ **;** | |
-| &nbsp;&nbsp; \| **import** $\langle iset \rangle$ **;** | |
-| &nbsp;&nbsp; \| **library** $\langle lname \rangle$ **with** **{** $\langle ldef \rangle^*$ **}** **;** | `define-library` |
-
-### Imports and Names
-
-| Production Rule | Description |
-| :--- | :--- |
-| $\langle iset \rangle$ &rarr; | **Import Sets (Postfix)** |
-| &nbsp;&nbsp; $\langle lname \rangle$ | Library name |
-| &nbsp;&nbsp; \| $\langle iset \rangle$ **exposing**$^?$ **(** $\langle id \rangle^{,*} $ **)** | `only` (exposing kw optional) |
-| &nbsp;&nbsp; \| $\langle iset \rangle$ **hiding** **(** $\langle id \rangle^{,*} $ **)** | `except` |
-| &nbsp;&nbsp; \| $\langle iset \rangle$ **renaming** **(** $\langle id\_as\_id \rangle^{,*} $ **)** | `rename` |
-| &nbsp;&nbsp; \| $\langle iset \rangle$ **qualifying** **(** $\langle prefix \rangle$ **)** | `prefix` |
-| $\langle id\_as\_id \rangle$ &rarr; $\langle id \rangle$ **as** $\langle id \rangle$ | |
-| $\langle lname \rangle$ &rarr; | |
-| &nbsp;&nbsp; $\langle lseg \rangle$ | |
-| &nbsp;&nbsp; \| $\langle lname \rangle$ **.** $\langle lseg \rangle$ | Dot notation (no spaces) |
-| $\langle lseg \rangle$ &rarr; $\langle id \rangle$ \| $\langle int \rangle$ | Name segment |
-
-### Commands (Statements)
-
-| Production Rule | Description |
-| :--- | :--- |
-| $\langle cmd \rangle$ &rarr; | |
-| &nbsp;&nbsp; $\langle let \rangle$ **;** | Let-like forms (block scoped) |
-| &nbsp;&nbsp; \| $\langle id \rangle$ **:=** $\langle exp \rangle$ **;** | Assignment `set!` |
-| &nbsp;&nbsp; \| **if** $\langle exp \rangle$ **then** $\langle exp \rangle$ **;** | Single-arm `if` |
-| &nbsp;&nbsp; \| $\langle exp \rangle$ **;** | Expression for side effects |
-
-### Data Constructors and Argument Lists
-
-| Production Rule | Description |
-| :--- | :--- |
-| $\langle vals \rangle$ &rarr; | **Values / Parentheses** |
-| &nbsp;&nbsp; **( )** | `(values)` |
-| &nbsp;&nbsp; \| **(** $\langle exp \rangle$ **)** | Grouping (priority override) |
-| &nbsp;&nbsp; \| **(** $\langle exp \rangle^{,+} $ **)** | `(values exp ...)` |
-| &nbsp;&nbsp; \| **(** $\langle exp \rangle^{,*} $ **@** $\langle exp \rangle$ **)** | `(apply values ...)` |
-| $\langle formals \rangle$ &rarr; | **Formal Arguments** |
-| &nbsp;&nbsp; **( )** | No arguments |
-| &nbsp;&nbsp; \| $\langle id \rangle$ | Single argument |
-| &nbsp;&nbsp; \| **(** $\langle id \rangle$ **)** | Single argument (explicit) |
-| &nbsp;&nbsp; \| **(** $\langle id \rangle^{,*} $ **)** | Multiple arguments |
-| &nbsp;&nbsp; \| **(** $\langle id \rangle^{,*} $ **@** $\langle id \rangle$ **)** | Arguments with rest param |
-| $\langle list \rangle$ &rarr; | **List Construction** |
-| &nbsp;&nbsp; **[ ]** | Empty list `'()` |
-| &nbsp;&nbsp; \| **[** $\langle exp \rangle^{,+} $ **]** | `(list ...)` |
-| &nbsp;&nbsp; \| **[** $\langle exp \rangle^{,*} $ **@** $\langle exp \rangle$ **]** | `(list* ...)` / `(apply list ...)` |
-| $\langle vector \rangle$ &rarr; | **Vector Construction** |
-| &nbsp;&nbsp; **#[ ]** | Empty vector `'#()` |
-| &nbsp;&nbsp; \| **#[** $\langle exp \rangle^{,+} $ **]** | `(vector ...)` |
-| &nbsp;&nbsp; \| **#[** $\langle exp \rangle^{,*} $ **@** $\langle exp \rangle$ **]** | `(apply vector ...)` |
-
-
----
-
