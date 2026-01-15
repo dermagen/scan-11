@@ -714,18 +714,15 @@ This section presents the complete formal grammar in extended BNF notation.
 
 ### Program Structure
 
-Here is the grammar reformatted using LaTeX arrays. This method provides the clean, borderless, "academic" look you requested, with distinct styling for $\langle \text{non-terminals} \rangle$ and $\textbf{terminals}$.
-
-### Program Structure
-
-$$
-\begin{array}{lcl}
+```math
+\begin{array}{r c l}
+\hspace{4cm} & \hspace{0.5cm} & \\[-1em]
 \text{\hspace{10em}} & \text{} & \text{\hspace{60em}} \\
 \langle program \rangle & \to & \langle def or cmd \rangle^{*} \\
 \langle def or cmd \rangle & \to & \langle def \rangle \\
 & \mid & \langle cmd \rangle
 \end{array}
-$$
+```
 
 ## test
 
@@ -733,7 +730,8 @@ $$
 ### Expressions
 
 ```math
-\begin{array}{lcl}
+\begin{array}{r c l}
+\hspace{4cm} & \hspace{0.5cm} & \\[-1em]
 \langle aexp \rangle & \to & \langle lit \rangle \\
 & \mid & \textbf{underscore} \\
 & \mid & \textbf{...} \\
