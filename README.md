@@ -1,24 +1,26 @@
 # SCAN-11
 Yet another (11th, to be exact) Scheme Algebraic Notation
 
-This document describes an algebraic surface syntax for Scheme code (NOT arbitrary S-expressions), inspired by the traditions of Haskell and ML. It maps directly to standard S-expressions but provides a cleaner, algebraic look and feel which some people prefer.
+This document describes an algebraic surface syntax for Scheme code (NOT arbitrary S-expressions), inspired by the traditions of Haskell and ML. It maps directly to standard S-expressions but provides a "contemporary", algebraic look and feel which some people prefer.
 
 ## 1. General Structure and Layout
 
-The syntax optionally uses Haskell-like **indentation-sensitive layout** rule (the "off-side rule") to minimize (or rather create a new type of) visual noise. While explicit braces `{ }`, semicolons `;`, and vertical bars `|` can be used to delimit blocks, statements, and clauses, they can be omitted if one pefers to use significant white space.
+The syntax optionally uses Haskell-like **indentation-sensitive layout** rule (the "off-side rule") to minimize (some would say create a new type of) visual noise. While explicit braces `{ }`, semicolons `;`, and vertical bars `|` can be used to delimit blocks, statements, and clauses, they can be omitted if one pefers to use significant white space instead.
 
 ### Layout Triggers
-Certain keywords trigger a layout context. If these keywords are **not** immediately followed by an opening brace `{`, the indentation of the next token establishes a column ("immediately" means nothing in between except white space and comments). Only plain spaces can be used to indent lines using significant whitespace.
-*   **Block Triggers** (`do`, `with`): Subsequent lines indented to this column are treated as statements separated by semicolons `;`.
-*   **Alternative Triggers** (`of`, `cond`): Subsequent lines indented to this column are treated as clauses separated by vertical bars `|`.
+Certain keywords trigger a layout context. If these keywords are **not** immediately followed by an opening brace `{`, current mode is saved, and the layout mode is activated. 
+*   "immediately" means nothing in between except white space and comments
+*   Only plain spaces can be used to indent lines using significant whitespace.
+*   **Regular Triggers** (`do`, `with`): subsequent lines indented to this column are treated as statements separated by semicolons `;`.
+*   **Alternative Triggers** (`of`, `cond`): subsequent lines indented to this column are treated as clauses separated by vertical bars `|`.
 
 Note: If an opening brace is not preceded by a trigger keyword, `do` is inserted automatically.
 
-In layout mode:
-1. The first token after the trigger keyword establishes the **reference column**; (open brace inserted before first token)
+In the layout mode:
+1. The first token after the trigger keyword establishes the **reference column**; (opening brace inserted before first token)
 2. Lines starting at the reference column begin new entries (separator is inserted before the line)
 3. Lines indented further continue the current entry
-4. Lines indented less close the implicit block (close brace inserted before the line)
+4. Lines indented less close the implicit block (closing brace inserted before the line); previous mode is restored
 
 This allows writing:
 
@@ -32,7 +34,11 @@ case x of
 instead of:
 
 ```
-case x of { RED -> 0 | GREEN -> 1 | BLUE -> 2 }
+case x of {
+  RED -> 0
+| GREEN -> 1
+| BLUE -> 2
+}
 ```
 
 **Example:**
