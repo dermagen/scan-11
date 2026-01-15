@@ -191,7 +191,8 @@ do {
 }
 ```
 
-Depending on contents, this compiles to Scheme's `let`-body or `begin`.
+Depending on contents, this parses as Scheme's `let`-body or `begin`. It is the latter if
+there are no definitions in the block, or if it contains only definitions.
 
 ### Let Expressions
 
