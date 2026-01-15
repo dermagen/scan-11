@@ -67,7 +67,7 @@ fn x ->
 
 ### Atomic Expressions and Operators
 
-Atomic expressions include identifiers, literals (numbers, strings, booleans, characters), and infix/prefix operator expressions. Standard operators include arithmetic (`+`, `-`, `*`, `/`, `quo`, `rem`, `div`, `mod`), comparison (`<`, `<=`, `=`, `>=`, `>`), and logical (`and`, `or`, `not`).
+Atomic expressions include identifiers, literals (numbers, strings, booleans, characters), and infix/prefix operator expressions. Standard operators include arithmetic (`+`, `-`, `*`, `/`, `quo`, `rem`, `div`, `mod`), comparison (`<`, `<=`, `=`, `>=`, `>`), logical (`and`, `or`, `not`), and list (`:`, `@`).
 
 ### Parenthesized Expressions and Multiple Values
 
@@ -92,7 +92,7 @@ f(x, y, z)
 map(double, xs)
 ```
 
-When `@` appears in the argument list, the call becomes an `apply`:
+When `@` appears before the last argument, the call becomes an `apply`:
 
 ```
 f(a, b, @rest)   -- becomes (apply f a b rest)
@@ -186,7 +186,7 @@ The `do` keyword introduces a block containing definitions, commands, and a fina
 ```
 do {
   val x = compute();
-  print(x);
+  write(x);
   x + 1
 }
 ```
@@ -333,7 +333,7 @@ include_ci "legacy.scm"
 Imports are written in a postfix, readable style similar to Haskell or Elm.
 Library names use dot notation without spaces: `scheme.base`, `srfi.1`.
 
-```haskell
+```
 import scheme.base                      -- (import (scheme base))
 import scheme.list exposing (map, fold) -- (import (only (scheme list) map fold))
 import scheme.list (map, fold)          -- same as above; exposing keyword is optional
@@ -343,7 +343,7 @@ import geometry qualifying (geo)        -- (import (prefix (geometry) geo-))
 ```
 
 The postfix notation can be used recursively:
-```haskell
+```
 import scheme.list (map, fold) renaming (fold as foldl)
 ```
 
@@ -695,6 +695,12 @@ Logical:
 ```
 and   or   not
 ```
+
+List:
+```
+:   @
+```
+
 
 Operators have conventional precedence, with parentheses available for explicit grouping. 
 Since whitespace is optional, expressions like `a+b*c` parse correctly according to precedence rules.
