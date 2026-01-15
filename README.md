@@ -401,7 +401,7 @@ foo
 string_to_list
 is_null
 set_box
-char_ready
+is_char_ready
 really_long_name
 ```
 
@@ -412,7 +412,7 @@ Identifiers are automatically translated to Scheme symbols according to these ru
 | Pattern | Scheme Form | Example |
 |---------|-------------|---------|
 | `is_xxx` | `xxx?` | `is_null` → `null?` |
-| `xxx_ip` | `xxx!` | `reverse_ip` → `reverse!` |
+| `xxx_mut` | `xxx!` | `reverse_mut` → `reverse!` |
 | `xxx_to_yyy` | `xxx->yyy` | `string_to_list` → `string->list` |
 | `xxx_w_yyy` | `xxx/yyy` | `call_w_cc` → `call/cc` |
 | `xxx_lt` | `xxx<` | `vector_lt` → `vector<` |
@@ -458,6 +458,22 @@ true false
 
 ```
 exposing  hiding  renaming  qualifying  as with
+```
+
+### Names behind operators
+
+Most operators are parsed as a simple procedure call or macro use with a Scheme name in the head position.
+For many operators this name is the symbolic name of the operator, but there are operators that when parsed
+insert a different name. In situation when this name is needed as an identifier expression, the operator can 
+be enclosed in parentheses, e.g.:
+
+```
+(+)      -- + (same for unary and binary)
+(-)      -- - (same for unary and binary)
+(quo)    -- quotient
+(rem)    -- remainder
+(:)      -- cons
+(@)      -- append 
 ```
 
 ### Escape to Scheme Reader
@@ -613,19 +629,20 @@ Characters and strings share Scheme string escape notations:
 
 | Literal | Character |
 |---------|-----------|
-| `'\n'` | Newline |
-| `'\t'` | Horizontal tab |
-| `'\r'` | Carriage return |
-| `'\\'` | Backslash |
-| `'\''` | Single quote |
-| `'\"'` | Double quote |
-| `'\a'` | Alarm (bell) |
-| `'\b'` | Backspace |
-| `'\|'` | Vertical bar |
-| `'\x1B;'` | Hex escape (ESC) |
-| `'\x03BB;'` | Hex escape (λ) |
+| `\n` | Newline |
+| `\t` | Horizontal tab |
+| `\r` | Carriage return |
+| `\\` | Backslash |
+| `\'` | Single quote (extension) |
+| `\"` | Double quote |
+| `\a` | Alarm (bell) |
+| `\b` | Backspace |
+| `\\|` | Vertical bar |
+| `\x1B;` | Hex escape (ESC) |
+| `\x03BB;` | Hex escape (λ) |
 
 Hex escapes begin with `\x`, followed by one or more hexadecimal digits, and terminated by a semicolon.
+In char notation, terminating semicolon is optional.
 
 A backslash before a newline allows strings to span lines; leading whitespace on the continuation line 
 is consumed up to an optional second backslash:
