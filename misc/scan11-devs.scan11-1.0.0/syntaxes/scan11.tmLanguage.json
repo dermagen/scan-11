@@ -1,0 +1,104 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "SCAN-11",
+  "scopeName": "source.scan11",
+  "fileTypes": ["scan11", "s11"],
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#strings" },
+    { "include": "#characters" },
+    { "include": "#symbols" },
+    { "include": "#booleans" },
+    { "include": "#numbers" },
+    { "include": "#definitions" },
+    { "include": "#keywords" },
+    { "include": "#functions" },
+    { "include": "#enums" },
+    { "include": "#identifiers" },
+    { "include": "#operators" },
+    { "include": "#punctuation" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "begin": "\\{-",
+          "end": "-\\}",
+          "name": "comment.block.scan11",
+          "patterns": [ { "include": "#comments" } ]
+        },
+        {
+          "begin": "--",
+          "end": "$",
+          "name": "comment.line.double-dash.scan11"
+        }
+      ]
+    },
+    "strings": {
+      "begin": "\"",
+      "end": "\"",
+      "name": "string.quoted.double.scan11",
+      "patterns": [ { "match": "\\\\.", "name": "constant.character.escape.scan11" } ]
+    },
+    "characters": {
+      "patterns": [
+        { "match": "'(\\\\.|[^'])'", "name": "string.quoted.single.char.scan11" },
+        { "match": "#\\\\[a-zA-Z0-9]+|#\\\\.", "name": "string.quoted.single.char.scan11" }
+      ]
+    },
+    "symbols": {
+      "patterns": [
+        { "match": "\\\\[']?[a-zA-Z0-9_:\\+\\-\\*/<>=!\\?]+", "name": "constant.other.symbol.scan11" },
+        { "match": "#\\\"[^\"]*\\\"", "name": "constant.other.symbol.scan11" }
+      ]
+    },
+    "booleans": {
+      "match": "\\b(true|false)\\b|#[tfTF]",
+      "name": "constant.language.boolean.scan11"
+    },
+    "numbers": {
+      "match": "(?<![A-Za-z0-9_])(?:#b[01]+|#o[0-7]+|#d[0-9]+|#x[0-9a-fA-F]+|[-+]?(?:inf\\.0|nan\\.0|[0-9]+(?:\\.[0-9]+)?(?:[eE][-+]?[0-9]+)?)(?:/[0-9]+|@[-+]?[0-9.]+|[-+][0-9.]+i|i)?)(?![A-Za-z0-9_])",
+      "name": "constant.numeric.scan11"
+    },
+    "definitions": {
+      "match": "\\b(val|syntax|record|label|for)\\s+([a-z][a-z0-9_]*)",
+      "captures": {
+        "1": { "name": "keyword.control.scan11" },
+        "2": { "name": "entity.name.function.scan11" }
+      }
+    },
+    "keywords": {
+      "match": "\\b(eq|eqv|quo|rem|div|mod|not|and|or|val|syntax|record|library|notation|fn|do|cond|case|of|let|letrec|in|if|then|else|guard|handle|on|label|for|when|unless|while|until|rules)\\b",
+      "name": "keyword.control.scan11"
+    },
+    "functions": {
+      "match": "\\b([a-z][a-z0-9_]*)\\s*(?=\\()",
+      "name": "entity.name.function.scan11"
+    },
+    "enums": {
+      "match": "\\b[A-Z][A-Z0-9_]*\\b",
+      "name": "constant.language.enum.scan11"
+    },
+    "identifiers": {
+      "match": "\\b[a-z][a-z0-9_]*\\b",
+      "name": "variable.other.scan11"
+    },
+    "operators": {
+      "match": "(:=|==|!=|<=|>=|->|=>|::|@@|\\.\\.\\.|=|<|>|\\+|-|\\*|/|@|:|\\|\\||\\||\\.|~|&|!|_)",
+      "name": "keyword.operator.scan11"
+    },
+    "punctuation": {
+      "patterns": [
+        { "match": "\\{", "name": "punctuation.definition.block.begin.scan11" },
+        { "match": "\\}", "name": "punctuation.definition.block.end.scan11" },
+        { "match": "\\(", "name": "punctuation.definition.parameters.begin.scan11" },
+        { "match": "\\)", "name": "punctuation.definition.parameters.end.scan11" },
+        { "match": "#\\[", "name": "punctuation.definition.vector.begin.scan11" },
+        { "match": "\\[", "name": "punctuation.definition.list.begin.scan11" },
+        { "match": "\\]", "name": "punctuation.definition.list.end.scan11" },
+        { "match": ",", "name": "punctuation.separator.comma.scan11" },
+        { "match": ";", "name": "punctuation.separator.statement.scan11" }
+      ]
+    }
+  }
+}

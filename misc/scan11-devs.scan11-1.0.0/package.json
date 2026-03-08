@@ -1,0 +1,38 @@
+{
+  "name": "scan11",
+  "displayName": "SCAN-11 Language Support",
+  "description": "Syntax highlighting and Nord-based theme for SCAN-11",
+  "version": "1.0.0",
+  "publisher": "scan11-devs",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Themes"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "scan11",
+        "aliases": ["SCAN-11", "scan11"],
+        "extensions": [".scan11", ".s11"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "scan11",
+        "scopeName": "source.scan11",
+        "path": "./syntaxes/scan11.tmLanguage.json"
+      }
+    ],
+    "themes": [
+      {
+        "label": "SCAN-11 Nord",
+        "uiTheme": "vs-dark",
+        "path": "./themes/scan11-color-theme.json"
+      }
+    ]
+  }
+}
